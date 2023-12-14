@@ -1,6 +1,8 @@
 package chess;
 
 import boardgame.Board;
+import boardgame.Piece;
+import boardgame.Position;
 import chess.pieces.King;
 import chess.pieces.Rook;
 
@@ -30,22 +32,58 @@ public class ChessMatch {
 		board.placePiece(piece, new ChessPosition(column, row).toPosition());
 	}
 
-	//método responsável por iniciar a partida de xadrez colocando as peças no tabuleiro
+	//método responsável por iniciar a partida de xadrez colocando as peças no tabuleiro nas devidas posições
 	private void initialSetup() {
 		placeNewPiece('c', 1, new Rook(board, Color.WHITE));
         placeNewPiece('c', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('d', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('e', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('e', 1, new Rook(board, Color.WHITE));
         placeNewPiece('d', 1, new King(board, Color.WHITE));
+        placeNewPiece('d', 2, new Rook(board, Color.WHITE));
+        placeNewPiece('e', 1, new Rook(board, Color.WHITE));
+        placeNewPiece('e', 2, new Rook(board, Color.WHITE));
+        
 
         placeNewPiece('c', 7, new Rook(board, Color.BLACK));
         placeNewPiece('c', 8, new Rook(board, Color.BLACK));
         placeNewPiece('d', 7, new Rook(board, Color.BLACK));
+        placeNewPiece('d', 8, new King(board, Color.BLACK));
         placeNewPiece('e', 7, new Rook(board, Color.BLACK));
         placeNewPiece('e', 8, new Rook(board, Color.BLACK));
-        placeNewPiece('d', 8, new King(board, Color.BLACK));
+        
 	}
 	
+	//método para mover as peças no tabuleiro (parâmetros: posição de origem, posição de destino) 
+	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
+		//converter as posições de origem e destino para posições de matriz
+		Position source = sourcePosition.toPosition();
+		Position target = targetPosition.toPosition();
+		
+		//validar se realmente existe peça na posição de origem
+		validateSourcePosition(source);
+		
+		//variável 'peça capturada' recebe o método de mover a peça considerando a origem e o destino (já no formato de matriz)
+		Piece capturedPiece = makeMove(source, target);
+		
+		return (ChessPiece)capturedPiece;		
+	}
+	
+	//método para validar se existe uma peça em tal posição de origem
+	private void validateSourcePosition(Position position) {
+		if(! board.thereIsAPiece(position)) {
+			throw new ChessException("There is no piece on source position"); //não existe peça na posição de origem
+		}
+		
+	}
+	
+	//método para mover uma peça de xadrez recebendo uma posição de origem e de destino
+	private Piece makeMove(Position source, Position target) {
+		//remove a peça que deseja mover da posição de origem
+		Piece p = board.removePiece(source);
+		//remove uma possível peça que esteja na posição de destino (por padrão, vai ser a peça capturada do adversário)
+		Piece capturedPiece = board.removePiece(target);
+		//coloco a peça p na posição de destino usando o método placePiece() para colocar a peça em determinada posição no tabuleiro 
+		board.placePiece(p, target);
+		//e retorna a peça que foi capturada
+		return capturedPiece;
+	}
 
 }

@@ -1,9 +1,13 @@
 package application;
 
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
 import chess.ChessPiece;
+import chess.ChessPosition;
 import chess.Color;
 
-public class UI { // classe de interface do usuario
+public class UI { // classe que representa a interface do usuario
 
 	// https://stackoverflow.com/questions/5762491/how-to-print-color-in-console-using-system-out-println
 
@@ -25,6 +29,21 @@ public class UI { // classe de interface do usuario
 	public static final String ANSI_PURPLE_BACKGROUND = "\u001B[45m";
 	public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
 	public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
+	
+	//método para ler uma posição que o usuário digitar (ex: a1, b5, f8...)
+	public static ChessPosition readChessPosition(Scanner sc) {
+		try {
+			String s = sc.nextLine();
+			char column = s.charAt(0); //lê o primeiro caracter digitado, que é referente a coluna do tabuleiro
+			int row = Integer.parseInt(s.substring(1)); //"recorta a string" para ler o segundo valor digitado, referente a linha do tabuleiro
+			return new ChessPosition(column, row); 
+		}
+		catch(RuntimeException e) {
+			throw new InputMismatchException("Error reading ChessPosition. Valid values are from a1 to h8."); //erro ao ler a posição de xadrez. 
+			                                                                                                  // Valores válidos são a1 ate h8.
+		}
+		
+	}
 
 	// método para imprimir o tabuleiro de xadrez no console
 	public static void printBoard(ChessPiece[][] pieces) {
@@ -54,5 +73,6 @@ public class UI { // classe de interface do usuario
 		}
 		System.out.print(" "); // espaço em branco para que as peças não fiquem coladas umas nas outras
 	}
+	
 
 }
