@@ -30,6 +30,13 @@ public class UI { // classe que representa a interface do usuario
 	public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
 	public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 	
+	
+	//método para limpar a tela a medida que o usuário for jogando - Fonte: https://stackoverflow.com/questions/2979383/java-clear-the-console
+	public static void clearScreen() { 
+		System.out.print("\033[H\033[2J"); 
+		System.out.flush(); 
+	} 
+	
 	//método para ler uma posição que o usuário digitar (ex: a1, b5, f8...)
 	public static ChessPosition readChessPosition(Scanner sc) {
 		try {
