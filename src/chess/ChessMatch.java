@@ -51,6 +51,16 @@ public class ChessMatch {
         
 	}
 	
+	//operação de movimentos possíveis dado uma posição (retorna uma matriz boolean contendo as posições possíveis)
+	public boolean[][] possibleMoves(ChessPosition sourcePosition) {
+		//converter posição de xadrez para uma posição de matriz normal
+		Position position = sourcePosition.toPosition();
+		//validar a posição
+		validateSourcePosition(position);
+		//retornar os movimentos possíveis da peça dessa posição
+		return board.piece(position).possibleMoves();
+	}
+	
 	//método para mover as peças no tabuleiro (parâmetros: posição de origem, posição de destino) 
 	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
 		//converter as posições de origem e destino para posições de matriz

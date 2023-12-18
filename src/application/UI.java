@@ -50,7 +50,6 @@ public class UI { // classe que representa a interface do usuario
 			throw new InputMismatchException("Error reading ChessPosition. Valid values are from a1 to h8."); //erro ao ler a posição de xadrez. 
 			                                                                                                  // Valores válidos são a1 ate h8.
 		}
-		
 	}
 
 	// método para imprimir o tabuleiro de xadrez no console
@@ -59,17 +58,33 @@ public class UI { // classe que representa a interface do usuario
 		for (int i = 0; i < pieces.length; i++) {
 			System.out.print((8 - i) + " ");
 			for (int j = 0; j < pieces.length; j++) {
-				printPiece(pieces[i][j]);
+				printPiece(pieces[i][j], false);
 			}
 			System.out.println();
 		}
 		System.out.println("  a b c d e f g h");
 	}
+	
+	// método para imprimir o tabuleiro de xadrez no console (colorindo as posições de possível movimento)
+		public static void printBoard(ChessPiece[][] pieces, boolean[][] possibleMoves) {
+			System.out.println();
+			for (int i = 0; i < pieces.length; i++) {
+				System.out.print((8 - i) + " ");
+				for (int j = 0; j < pieces.length; j++) {
+					printPiece(pieces[i][j], possibleMoves[i][j]);
+				}
+				System.out.println();
+			}
+			System.out.println("  a b c d e f g h");
+		}
 
-	// método auxiliar para imprimir UMA peça
-	private static void printPiece(ChessPiece piece) {
+	// método auxiliar para imprimir UMA peça e colorir ou não o fundo
+	private static void printPiece(ChessPiece piece, boolean background) {
+		if(background) { //se backgroung for true, destaca o fundo
+			System.out.print(ANSI_BLUE_BACKGROUND);
+		}
 		if (piece == null) {
-			System.out.print("-");
+			System.out.print("-" + ANSI_RESET);
 		} 
 		else {
 			if (piece.getColor() == Color.WHITE) {
