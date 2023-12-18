@@ -32,6 +32,7 @@ public class UI { // classe que representa a interface do usuario
 	
 	
 	//método para limpar a tela a medida que o usuário for jogando - Fonte: https://stackoverflow.com/questions/2979383/java-clear-the-console
+	//Funciona no git bash e no cmd (entrando na pasta bin). 
 	public static void clearScreen() { 
 		System.out.print("\033[H\033[2J"); 
 		System.out.flush(); 
