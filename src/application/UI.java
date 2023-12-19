@@ -1,7 +1,10 @@
 package application;
 
+import java.util.Arrays;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import chess.ChessMatch;
 import chess.ChessPiece;
@@ -98,13 +101,35 @@ public class UI { // classe que representa a interface do usuario
 		System.out.print(" "); // espaço em branco para que as peças não fiquem coladas umas nas outras
 	}
 	
-	// método para imprimir a partida de xadrez (vai mostrar o tabuleiro, o turno, o jogador atual)
-	public static void printMatch(ChessMatch chessMatch) {
+	// método para imprimir a partida de xadrez (vai mostrar o tabuleiro, as peças capturadas, o turno, o jogador atual)
+	public static void printMatch(ChessMatch chessMatch, List<ChessPiece> captured) {
 		printBoard(chessMatch.getPieces()); //imprime o tabuleiro
+		System.out.println();
+		printCapturedPieces(captured); //imprime peças capturadas
 		System.out.println();
 		System.out.println("Turn: " + chessMatch.getTurn());
 		System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
 	}
 	
+	//método para imprimir as peças capturadas recebendo uma lista (com as peças que forem capturadas)
+	private static void printCapturedPieces(List<ChessPiece> captured) {
+		//declara uma lista de peças brancas  (filtra as peças brancas da lista de peças capturadas)
+		List<ChessPiece> white = captured.stream().filter(x -> x.getColor() == Color.WHITE).collect(Collectors.toList());
+		//declara uma lista de peças pretas  (filtra as peças pretas da lista de peças capturadas)
+		List<ChessPiece> black = captured.stream().filter(x -> x.getColor() == Color.BLACK).collect(Collectors.toList());
+		
+		//lógica para imprimir as listas na tela
+		System.out.println("Captured pieces:");
+		System.out.print("White: ");
+		System.out.print(ANSI_WHITE); //garante que as peças serão impressas na cor branca
+		System.out.println(Arrays.toString(white.toArray())); //método padrão para imprimir um array de valores no Java
+		System.out.print(ANSI_RESET); //reseta a cor
+		
+		System.out.print("Black: ");
+		System.out.print(ANSI_YELLOW); //garante que as peças serão impressas na cor amarela (que está representando as peças Pretas)
+		System.out.println(Arrays.toString(black.toArray())); 
+		System.out.print(ANSI_RESET); 
+		
+	}
 
 }
