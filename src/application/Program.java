@@ -21,7 +21,7 @@ public class Program {
 				UI.clearScreen(); 
 				
 				//função para imprimir o tabuleiro com as peças
-				UI.printBoard(chessMatch.getPieces());
+				UI.printMatch(chessMatch);
 				System.out.println();
 				
 				//leitura da posição que o usuário quer mover uma peça

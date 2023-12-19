@@ -10,10 +10,24 @@ public class ChessMatch {
 	//classe que detém as regras do jogo de xadrez
 	
 	private Board board;
-
-	public ChessMatch() {   //partida de xadrez
+	private int turn;   //turno
+	private Color currentPlayer; //jogador atual
+	
+	
+	//construtor da partida de xadrez
+	public ChessMatch() {   
 		board = new Board(8,8);  //define o tabuleiro com tamanho 8x8
+		turn = 1; //no início da partida o turno vale 1
+		currentPlayer = Color.WHITE;  //primeiro a jogar é o jogador com peças brancas
 		initialSetup(); //chama o método de iniciar partida
+	}
+	
+	public int getTurn() {
+		return turn;
+	}
+	
+	public Color getCurrentPlayer() {
+		return currentPlayer;
 	}
 	
 	//método que retorna uma matriz de peças da partida de xadrez
@@ -74,7 +88,7 @@ public class ChessMatch {
 		
 		//variável 'peça capturada' recebe o método de mover a peça considerando a origem e o destino (já no formato de matriz)
 		Piece capturedPiece = makeMove(source, target);
-		
+		nextTurn();
 		return (ChessPiece)capturedPiece;		
 	}
 	
@@ -83,6 +97,10 @@ public class ChessMatch {
 		if(! board.thereIsAPiece(position)) {
 			throw new ChessException("There is no piece on source position"); //não existe peça na posição de origem
 		}
+		//se a peça escolhida pelo jogador atual for de cor diferente da dele, lança uma exceção
+		if(currentPlayer != ((ChessPiece)board.piece(position)).getColor()) {
+			throw new ChessException("The chosen piece is not yours");  //a peça escolhida não é sua
+		}	
 		//testar se existe movimentos possíveis para a peça
 		if(! board.piece(position).isThereAnyPossibleMove()) { //se não tiver nenhum movimento possível, lança uma exceção
 			throw new ChessException("There is no possible moves for the chosen piece"); //não há movimentos possíveis para essa peça
@@ -94,6 +112,14 @@ public class ChessMatch {
 		if(! board.piece(source).possibleMove(target)) { //se para a peça de origem, a posição de destino não é um movimento possível, então não posso mover a peça
 			throw new ChessException("The chosen piece can't move to target position"); //a peça escolhida não pode se mover para a posição de destino
 		}
+	}
+	
+	//método para fazer a troca de turno
+	private void nextTurn() {
+		turn++; //incrementa o turno -> turno = turno + 1
+		//altera a cor do jogador atual a cada troca de turno				
+		currentPlayer = (currentPlayer == Color.WHITE) ? Color.BLACK : Color.WHITE; 
+						//se jogador atual for igual branco, troca para preto. Se não, troca de preto para branco
 	}
 	
 	//método para mover uma peça de xadrez recebendo uma posição de origem e de destino
