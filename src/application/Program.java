@@ -45,8 +45,7 @@ public class Program {
 				if(capturedPiece != null) {
 					captured.add(capturedPiece); //adiciona a peça na lista de peças capturadas
 				}
-				
-				
+
 			}
 			catch(ChessException e) {
 				System.out.println(e.getMessage());

@@ -42,7 +42,7 @@ public class ChessPosition {
 	
 	//método que converte uma posição normal da Matriz em coordenada/posição de xadrez
 	protected static ChessPosition fromPosition(Position position) {
-		return new ChessPosition((char)('a' - position.getColumn()), 8 - position.getRow());
+		return new ChessPosition((char)('a' + position.getColumn()), 8 - position.getRow());
 	}
 
 	@Override

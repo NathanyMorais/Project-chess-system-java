@@ -109,6 +109,9 @@ public class UI { // classe que representa a interface do usuario
 		System.out.println();
 		System.out.println("Turn: " + chessMatch.getTurn());
 		System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
+		if(chessMatch.getCheck() == true) {
+			System.out.println("CHECK!");
+		}
 	}
 	
 	//método para imprimir as peças capturadas recebendo uma lista (com as peças que forem capturadas)

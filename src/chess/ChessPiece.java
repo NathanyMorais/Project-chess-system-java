@@ -25,5 +25,16 @@ public abstract class ChessPiece extends Piece {
 		return p != null && p.getColor() != color;
 	}
 	
+	//REGRA DO CHECK: check significa que o seu Rei está sob a ameaça de pelo menos uma peça de seu oponente
+	//quando um jogador está em check, ele é OBRIGADO a sair do check. Se não for possível sair do check, é check mate.
+	//o jogador NÃO PODE se colocar em check, não pode deixar o Rei em check. Se isso acontecer, ele deve receber um aviso e ser impedido de fazer a jogada
+	
+	//método para retornar uma posição no formato do xadrez = letra + numero
+	public ChessPosition getChessPosition() {
+		return ChessPosition.fromPosition(position);
+	}
+	
+	
+	
 	
 }
