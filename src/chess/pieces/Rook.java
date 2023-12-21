@@ -66,7 +66,7 @@ public class Rook extends ChessPiece{ //classe Torre (Rook)
 		}
 		
 		return mat;
-		
+
 	} 
 	
 }

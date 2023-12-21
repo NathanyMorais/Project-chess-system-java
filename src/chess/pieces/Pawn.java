@@ -9,7 +9,6 @@ public class Pawn extends ChessPiece{ //PEÃO
 
 	public Pawn(Board board, Color color) {
 		super(board, color);
-	
 	}
 	
 	//REGRA DO PEÃO: o peão só pode mover 1 casa para frente por vez. Exceto se for seu primeiro movimento (ou seja, moveCount = 0), então pode mover duas casas para frente.
