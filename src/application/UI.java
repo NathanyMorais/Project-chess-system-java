@@ -108,10 +108,16 @@ public class UI { // classe que representa a interface do usuario
 		printCapturedPieces(captured); //imprime peças capturadas
 		System.out.println();
 		System.out.println("Turn: " + chessMatch.getTurn());
-		System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
-		if(chessMatch.getCheck() == true) {
-			System.out.println("CHECK!");
+		if(!chessMatch.getCheckMate()) { //se não tiver em checkMate continua a partida para a próxima jogada
+			System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
+			if(chessMatch.getCheck() == true) {
+				System.out.println("CHECK!");
+			}
+		}else { //se tiver em checkMate encerra a partida mostrando o Vencedor
+			System.out.println("CHECKMATE!");
+			System.out.println("Winner: " + chessMatch.getCurrentPlayer() );
 		}
+		
 	}
 	
 	//método para imprimir as peças capturadas recebendo uma lista (com as peças que forem capturadas)

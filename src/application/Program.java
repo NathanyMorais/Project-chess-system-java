@@ -20,7 +20,7 @@ public class Program {
 		
 		List<ChessPiece> captured = new ArrayList<>(); //declarando uma lista de peças capturadas (inicialmente vazia)
 		
-		while (true) {
+		while (!chessMatch.getCheckMate()) { //a partida continua enquanto não houver checkMate
 			try {
 				UI.clearScreen(); 
 				
@@ -56,5 +56,8 @@ public class Program {
 				sc.nextLine();
 			}	
 		}
+		//após ocorrer o xequemate (fora do laço while)
+		UI.clearScreen(); //limpa a tela e 
+		UI.printMatch(chessMatch, captured); //imprime a partida finalizada
 	}
 }

@@ -17,6 +17,7 @@ public class ChessMatch {
 	private int turn;   //turno
 	private Color currentPlayer; //jogador atual
 	private boolean check; //check significa que o seu Rei está sob a ameaça de pelo menos uma peça de seu oponente (check tem valor igual a false por padrão)
+	private boolean checkMate;
 	
 	private List<Piece> piecesOnTheBoard = new ArrayList<>(); //lista de peças no tabuleiro
 	private List<Piece> capturedPieces = new ArrayList<>();  //lista de peças capturadas
@@ -42,6 +43,10 @@ public class ChessMatch {
 		return check;
 	}
 	
+	public boolean getCheckMate() {
+		return checkMate;
+	}
+	
 	//método que retorna uma matriz de peças da partida de xadrez
 	public ChessPiece[][] getPieces(){
 		ChessPiece[][] mat = new ChessPiece[board.getRows()][board.getColumns()];
@@ -61,21 +66,12 @@ public class ChessMatch {
 
 	//método responsável por iniciar a partida de xadrez colocando as peças no tabuleiro nas devidas posições
 	private void initialSetup() {
-		placeNewPiece('c', 1, new Rook(board, Color.WHITE));
-        placeNewPiece('c', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('d', 1, new King(board, Color.WHITE));
-        placeNewPiece('d', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('e', 1, new Rook(board, Color.WHITE));
-        placeNewPiece('e', 2, new Rook(board, Color.WHITE));
-        
-
-        placeNewPiece('c', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('c', 8, new Rook(board, Color.BLACK));
-        placeNewPiece('d', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('d', 8, new King(board, Color.BLACK));
-        placeNewPiece('e', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('e', 8, new Rook(board, Color.BLACK));
-        
+		placeNewPiece('h', 7, new Rook(board, Color.WHITE));
+        placeNewPiece('d', 1, new Rook(board, Color.WHITE));
+        placeNewPiece('e', 1, new King(board, Color.WHITE));
+     
+        placeNewPiece('a', 8, new King(board, Color.BLACK));
+        placeNewPiece('b', 8, new Rook(board, Color.BLACK));
 	}
 	
 	//operação de movimentos possíveis dado uma posição (retorna uma matriz boolean contendo as posições possíveis)
@@ -111,10 +107,15 @@ public class ChessMatch {
 		//se o oponente ficou em Check, precisa atualizar o valor do atributo check para True
 		check = (testCheck(opponent(currentPlayer))) ? true : false;
 		
-		nextTurn();
+		//testa se o oponente ficou em CheckMate após a jogada
+		if (testCheckMate(opponent(currentPlayer))) {
+			checkMate = true;
+		}
+		else { //se não estiver em checkMate, passa para o próximo turno e o jogo continua
+			nextTurn();
+		}
+		
 		return (ChessPiece)capturedPiece;	
-		
-		
 	}
 	
 	//método para validar se existe uma peça em tal posição de origem
@@ -219,4 +220,35 @@ public class ChessMatch {
 		return false;
 	}
 	
+	//REGRA DO XEQUEMATE: o Rei está em Check e NÃO existe nenhum movimento possível que o tire do Check.
+	private boolean testCheckMate(Color color) {
+		//teste para eliminar a possibilidade do Rei não estar em check
+		if(!testCheck(color)) { //se o Rei não estiver em check, retorna false
+			return false;
+		}
+	//testar se todas as peças daquela cor não tem nenhum movimento possível que tire o rei do check (logo, ele estará em xequemate)
+	List<Piece> list = piecesOnTheBoard.stream().filter(x -> ((ChessPiece)x).getColor() == color).collect(Collectors.toList());
+	for(Piece p : list) { //para cada peça 'p' na lista de peças que estão no tabuleiro:
+		//pegar os movimentos possíveis de cada peça 'p'
+		boolean [][] mat = p.possibleMoves();
+		//percorrer a matriz
+		for (int i=0; i<board.getRows(); i++) {
+			for(int j=0; j<board.getColumns(); j++) {
+				if(mat[i][j]) { //se essa posição da matriz for um movimento possível, vou testar se esse movimento pode ou não tirar o Rei do check
+				//pega a peça 'p' e move para essa posição da matriz que representa um movimento possível, e então verifica se o Rei continua em check ou não
+					Position source = ((ChessPiece)p).getChessPosition().toPosition(); //posição de origem da peça 'p'
+					Position target = new Position(i, j); //posição de destino da peça 'p', que no caso, é a posição i,j da matriz
+					Piece capuredPiece = makeMove(source, target); //movendo a peça 'p'
+					boolean testCheck = testCheck(color); //testa se o Rei ainda está em Check
+					undoMove(source, target, capuredPiece); //desfaz o movimento feito com a peça 'p', pois foi apenas para teste
+					if(!testCheck) { //se o Rei não estava em check após a movimentação da peça 'p', retorna false, pois ele não está em xequemate
+						return false;
+					}
+				}
+			}
+		}
+	}
+	return true; //se o Rei continuou em check após testar os movimentos possíveis de todas as peças aliadas que ainda estão no tabuleiro, então é Xequemate
+	}
 }
+
