@@ -7,6 +7,7 @@ import boardgame.Position;
 public abstract class ChessPiece extends Piece {
 
 	private Color color;
+	private int moveCount; //por padrão, atributos do tipo int começam com o valor 0 (não é necessário adicionar ao construtor, uma vez que seu valor inicial já é zero)
 	
 	public ChessPiece(Board board, Color color) {
 		super(board);
@@ -15,6 +16,19 @@ public abstract class ChessPiece extends Piece {
 
 	public Color getColor() {
 		return color;
+	}
+	
+	public int getMoveCount() {
+		return moveCount;
+	}
+	
+	//métodos para contagem dos movimentos das peças
+	public void increaseMoveCount() { //incrementa quando faz um movimento com a peça
+		moveCount++;
+	}
+	
+	public void decreaseMoveCount() { //decrementa quando desfaz um movimento feito anteriormente
+		moveCount--;
 	}
 	
 	//método para verificar se existe uma peça adversária em determinada posição

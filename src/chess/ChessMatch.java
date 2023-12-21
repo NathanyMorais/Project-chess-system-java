@@ -151,7 +151,8 @@ public class ChessMatch {
 	//método para mover uma peça de xadrez recebendo uma posição de origem e de destino
 	private Piece makeMove(Position source, Position target) {
 		//remove a peça que deseja mover da posição de origem
-		Piece p = board.removePiece(source);
+		ChessPiece p = (ChessPiece) board.removePiece(source);
+		p.increaseMoveCount(); //quando move a peça, incrementa na contagem dos movimentos
 		//remove uma possível peça que esteja na posição de destino (por padrão, vai ser a peça capturada do adversário)
 		Piece capturedPiece = board.removePiece(target);
 		//coloco a peça p na posição de destino usando o método placePiece() para colocar a peça em determinada posição no tabuleiro 
@@ -173,7 +174,8 @@ public class ChessMatch {
 	//método para desfazer o movimento (faz o inverso do método makeMove)
 	private void undoMove(Position source, Position target, Piece capturedPiece) {
 		//remove a peça que foi colocada na posição de destino
-		Piece p = board.removePiece(target);
+		ChessPiece p = (ChessPiece) board.removePiece(target);
+		p.decreaseMoveCount(); //quando um movimento é desfeito, tbm é retirado da contagem 
 		//coloca a peça de volta na posição de origem
 		board.placePiece(p, source);
 		
