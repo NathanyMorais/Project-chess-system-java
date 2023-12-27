@@ -22,10 +22,10 @@ public class ChessMatch {
 	private Color currentPlayer; //jogador atual
 	private boolean check; //check significa que o seu Rei está sob a ameaça de pelo menos uma peça de seu oponente (check tem valor igual a false por padrão)
 	private boolean checkMate;
+	private ChessPiece enPassantVulnerable; //propriedade que representa um peão vulnerável a jogada En Passant (por padrão, começa com valor null, por isso não foi iniciada no construtor)
 	
 	private List<Piece> piecesOnTheBoard = new ArrayList<>(); //lista de peças no tabuleiro
 	private List<Piece> capturedPieces = new ArrayList<>();  //lista de peças capturadas
-	
 	
 	//construtor da partida de xadrez
 	public ChessMatch() {   
@@ -49,6 +49,10 @@ public class ChessMatch {
 	
 	public boolean getCheckMate() {
 		return checkMate;
+	}
+	
+	public ChessPiece getEnPassantVulnerable() {
+		return enPassantVulnerable;
 	}
 	
 	//método que retorna uma matriz de peças da partida de xadrez
@@ -78,14 +82,14 @@ public class ChessMatch {
         placeNewPiece('f', 1, new Bishop(board, Color.WHITE));
         placeNewPiece('g', 1, new Knight(board, Color.WHITE));
         placeNewPiece('h', 1, new Rook(board, Color.WHITE));
-        placeNewPiece('a', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('b', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('c', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('d', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('e', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('f', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('g', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('h', 2, new Pawn(board, Color.WHITE));
+        placeNewPiece('a', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('b', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('c', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('d', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('e', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('f', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('g', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('h', 2, new Pawn(board, Color.WHITE, this));
 
         placeNewPiece('a', 8, new Rook(board, Color.BLACK));
         placeNewPiece('b', 8, new Knight(board, Color.BLACK));
@@ -95,14 +99,14 @@ public class ChessMatch {
         placeNewPiece('f', 8, new Bishop(board, Color.BLACK));
         placeNewPiece('g', 8, new Knight(board, Color.BLACK));
         placeNewPiece('h', 8, new Rook(board, Color.BLACK));
-        placeNewPiece('a', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('b', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('c', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('d', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('e', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('f', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('g', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('h', 7, new Pawn(board, Color.BLACK));
+        placeNewPiece('a', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('b', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('c', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('d', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('e', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('f', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('g', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('h', 7, new Pawn(board, Color.BLACK, this));
 	}
 	
 	//operação de movimentos possíveis dado uma posição (retorna uma matriz boolean contendo as posições possíveis)
@@ -135,6 +139,8 @@ public class ChessMatch {
 			throw new ChessException("You can't put yourself in check"); //você não pode se colocar em xeque
 		}
 		
+		ChessPiece movedPiece = (ChessPiece) board.piece(target); //representa uma peça que foi movida (variável para testar a jogada En Passant)
+		
 		//se o oponente ficou em Check, precisa atualizar o valor do atributo check para True
 		check = (testCheck(opponent(currentPlayer))) ? true : false;
 		
@@ -144,6 +150,16 @@ public class ChessMatch {
 		}
 		else { //se não estiver em checkMate, passa para o próximo turno e o jogo continua
 			nextTurn();
+		}
+		
+		//Lógica para testar a jogada especial EN PASSANT
+		//Se a peça movida é instancia de Peão e se andou 2 casas para a posição de destino, significa que foi um movimento inicial de peão com 2 casas
+		if(movedPiece instanceof Pawn && (target.getRow() == source.getRow() - 2 || target.getRow() == source.getRow() + 2)) {
+			//então o peão está vulnerável a tomar um En Passant no próximo turno
+			enPassantVulnerable = movedPiece;
+		}
+		else { //caso contrário, o peão não está vulnerável e não há jogada especial
+			enPassantVulnerable = null;
 		}
 		
 		return (ChessPiece)capturedPiece;	
@@ -219,6 +235,27 @@ public class ChessMatch {
 			rook.increaseMoveCount(); //incrementa a quantidade de movimentos feito com a Torre
 		}
 		
+		//implementando Lógica da jogada especial En Passant
+		//se a peça p movida foi uma instancia de Peão
+		if(p instanceof Pawn) {
+			//se o peão andou na diagonal (coluna de origem diferente da coluna de destino) e não tem peça capturada (pelo método normal), 
+			//então foi um caso de En Passant
+			if(source.getColumn() != target.getColumn() && capturedPiece == null) {
+				//pega a posição do peão que deve ser capturado (se está a direita ou a esquerda da peça que moveu)
+				Position pawnPosition;
+				//se a cor da peça que moveu for branca, quer dizer que a peça a ser capturada está embaixo do meu peão 
+				if(p.getColor() == Color.WHITE) {
+					pawnPosition = new Position(target.getRow() + 1, target.getColumn());
+				}
+				else { //se a cor da peça que moveu for preta, quer dizer que a peça a ser capturada está em cima do meu peão
+					pawnPosition = new Position(target.getRow() - 1, target.getColumn());
+				}
+				
+				capturedPiece = board.removePiece(pawnPosition); //a peça capturada é o peão que está sendo removido do tabuleiro
+				capturedPieces.add(capturedPiece); //adiciono o peão na lista de peças capturadas
+				piecesOnTheBoard.remove(capturedPiece); //remove esse peão da lista de peças do tabuleiro
+			}
+		}
 		//e retorna a peça que foi capturada
 		return capturedPiece;
 	}
@@ -265,6 +302,25 @@ public class ChessMatch {
 			ChessPiece rook = (ChessPiece) board.removePiece(targetTorre); //pega a peça Torre e remove da posição de destino
 			board.placePiece(rook, sourceTorre); //retorna a peça Torre para a posição de origem
 			rook.decreaseMoveCount(); //decrementa a quantidade de movimentos feito com a Torre
+		}
+		
+		//Desfaz a jogada especial En Passant
+		//se a peça p movida foi uma instancia de Peão
+		if(p instanceof Pawn) {
+			//se o peão andou na diagonal (coluna de origem diferente da coluna de destino) e se a peça capturada foi uma peça vulnerável a tomar En Passant
+			if(source.getColumn() != target.getColumn() && capturedPiece == enPassantVulnerable) {
+				//pegar a peça que está capturada e colocar ela 'manualmente' no lugar correto (que não é a posição de destino)
+				ChessPiece pawn = (ChessPiece) board.removePiece(target);
+				Position pawnPosition;
+				//se a peça que capturou o peão for branca, quer dizer que a peça capturada é preta e deve ir pra linha 3 
+				if(p.getColor() == Color.WHITE) {
+					pawnPosition = new Position(3, target.getColumn());
+				}
+				else { //se a peça que capturou for preta, quer dizer que a peça capturada é branca e deve ir pra linha 4
+					pawnPosition = new Position(4, target.getColumn());
+				}	
+				board.placePiece(pawn, pawnPosition);
+			}
 		}
 	}
 	

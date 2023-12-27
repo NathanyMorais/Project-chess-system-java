@@ -2,13 +2,23 @@ package chess.pieces;
 
 import boardgame.Board;
 import boardgame.Position;
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.Color;
 
 public class Pawn extends ChessPiece{ //PEÃO
-
-	public Pawn(Board board, Color color) {
+	
+	/*	JOGADAS ESPECIAIS: 
+	-> JOGADA EN PASSANT: é uma captura especial do Peão adversário, quando o mesmo foi movido 2 casas pelo jogador oponente.
+	 No avanço de duas casas do peão adversário, caso seu peão esteja na coluna ao lado e na mesma fileira, você pode capturar o peão que foi movido 
+	 como se tivesse havido um avanço de somente uma casa.
+*/
+	
+	private ChessMatch chessMatch;
+	
+	public Pawn(Board board, Color color, ChessMatch chessMatch) {
 		super(board, color);
+		this.chessMatch = chessMatch;
 	}
 	
 	//REGRA DO PEÃO: o peão só pode mover 1 casa para frente por vez. Exceto se for seu primeiro movimento (ou seja, moveCount = 0), então pode mover duas casas para frente.
@@ -44,6 +54,27 @@ public class Pawn extends ChessPiece{ //PEÃO
 			if(getBoard().positionExists(p) && isThereOpponentPiece(p)) { //se a posição existir e tiver uma peça do oponente lá, então pode se mover
 				mat[p.getRow()][p.getColumn()] = true;
 			}
+			
+			//Movimento especial de EN PASSANT para o Peão BRANCO
+			//quando um peão branco ocupa a linha 3 da matriz (linha 5 na coordenada tabuleiro de xadrez), pode estar apto a fazer En Passant se for o caso
+			if(position.getRow() == 3) {
+				//testa se tem uma peça adversária do Lado Esquerdo do meu Peão (mesma linha do peão, uma coluna para a esquerda)
+				Position left = new Position(position.getRow(), position.getColumn() - 1);
+				//se posição esquerda existe E se tem uma peça oponente lá E se essa peça está vulnerável para tomar a jogada En Passant
+				if(getBoard().positionExists(left) && isThereOpponentPiece(left) && getBoard().piece(left) == chessMatch.getEnPassantVulnerable()) {
+					//então meu peão pode capturar essa peça (mas ele não se move para o lugar dela, e sim para uma linha Acima)
+					mat[left.getRow() - 1][left.getColumn()] = true;
+				}
+				
+				//testa se tem uma peça adversária do Lado Direito do meu Peão (mesma linha do peão, uma coluna para a direita)
+				Position right = new Position(position.getRow(), position.getColumn() + 1);
+				//se posição direita existe E se tem uma peça oponente lá E se essa peça está vulnerável para tomar a jogada En Passant
+				if(getBoard().positionExists(right) && isThereOpponentPiece(right) && getBoard().piece(right) == chessMatch.getEnPassantVulnerable()) {
+					//então meu peão pode capturar essa peça (mas ele não se move para o lugar dela, e sim para uma linha Acima)
+					mat[right.getRow() - 1][right.getColumn()] = true;
+				}
+			}
+			
 		}
 		//posições livres para o peão de cor PRETA (sempre anda pra baixo no tabuleiro)
 		else {
@@ -69,6 +100,26 @@ public class Pawn extends ChessPiece{ //PEÃO
 			if(getBoard().positionExists(p) && isThereOpponentPiece(p)) { //se a posição existir e tiver uma peça do oponente lá, então pode se mover
 				mat[p.getRow()][p.getColumn()] = true;
 			}	
+			
+			//Movimento especial de EN PASSANT para o Peão PRETO
+			//quando um peão Preto ocupa a linha 4 da matriz (linha 4 na coordenada tabuleiro de xadrez), pode estar apto a fazer En Passant se for o caso
+			if(position.getRow() == 4) {
+				//testa se tem uma peça adversária do Lado Esquerdo do meu Peão (mesma linha do peão, uma coluna para a esquerda)
+				Position left = new Position(position.getRow(), position.getColumn() - 1);
+				//se posição esquerda existe E se tem uma peça oponente lá E se essa peça está vulnerável para tomar a jogada En Passant
+				if(getBoard().positionExists(left) && isThereOpponentPiece(left) && getBoard().piece(left) == chessMatch.getEnPassantVulnerable()) {
+					//então meu peão pode capturar essa peça (mas ele não se move para o lugar dela, e sim para uma linha Abaixo)
+					mat[left.getRow() + 1][left.getColumn()] = true;
+				}
+				
+				//testa se tem uma peça adversária do Lado Direito do meu Peão (mesma linha do peão, uma coluna para a direita)
+				Position right = new Position(position.getRow(), position.getColumn() + 1);
+				//se posição direita existe E se tem uma peça oponente lá E se essa peça está vulnerável para tomar a jogada En Passant
+				if(getBoard().positionExists(right) && isThereOpponentPiece(right) && getBoard().piece(right) == chessMatch.getEnPassantVulnerable()) {
+					//então meu peão pode capturar essa peça (mas ele não se move para o lugar dela, e sim para uma linha Abaixo)
+					mat[right.getRow() + 1][right.getColumn()] = true;
+				}
+			}
 		}
 		return mat;
 	}
