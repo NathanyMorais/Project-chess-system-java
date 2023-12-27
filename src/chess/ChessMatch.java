@@ -74,7 +74,7 @@ public class ChessMatch {
 		placeNewPiece('b', 1, new Knight(board, Color.WHITE));
         placeNewPiece('c', 1, new Bishop(board, Color.WHITE));
         placeNewPiece('d', 1, new Queen(board, Color.WHITE));
-        placeNewPiece('e', 1, new King(board, Color.WHITE));
+        placeNewPiece('e', 1, new King(board, Color.WHITE, this)); //palavra this faz referência a própria partida de xadrez (chessMatch)
         placeNewPiece('f', 1, new Bishop(board, Color.WHITE));
         placeNewPiece('g', 1, new Knight(board, Color.WHITE));
         placeNewPiece('h', 1, new Rook(board, Color.WHITE));
@@ -91,7 +91,7 @@ public class ChessMatch {
         placeNewPiece('b', 8, new Knight(board, Color.BLACK));
         placeNewPiece('c', 8, new Bishop(board, Color.BLACK));
         placeNewPiece('d', 8, new Queen(board, Color.BLACK));
-        placeNewPiece('e', 8, new King(board, Color.BLACK));
+        placeNewPiece('e', 8, new King(board, Color.BLACK, this));
         placeNewPiece('f', 8, new Bishop(board, Color.BLACK));
         placeNewPiece('g', 8, new Knight(board, Color.BLACK));
         placeNewPiece('h', 8, new Rook(board, Color.BLACK));
@@ -193,6 +193,32 @@ public class ChessMatch {
 			piecesOnTheBoard.remove(capturedPiece);
 			capturedPieces.add(capturedPiece);
 		}
+		
+		//implementando Lógica da jogada especial Roque Pequeno
+		//se a peça p que foi movida, for uma instancia de Rei e sua posição de destino for igual a posição de origem + 2, 
+		//significa que o Rei andou duas casas para a direita, o que configura uma jogada de Roque Pequeno
+		if(p instanceof King && target.getColumn() == source.getColumn() + 2) {
+			//posição de Origem da Torre = 3 colunas a direita do Rei
+			Position sourceTorre = new Position(source.getRow(), source.getColumn() + 3);
+			//posição de Destino da Torre = 1 coluna a direita do Rei
+			Position targetTorre = new Position(source.getRow(), source.getColumn() + 1);
+			ChessPiece rook = (ChessPiece) board.removePiece(sourceTorre); //pega a peça Torre e remove da posição de origem
+			board.placePiece(rook, targetTorre); //move a peça Torre para a posição de destino
+			rook.increaseMoveCount(); //incrementa a quantidade de movimentos feito com a Torre
+		}
+		//implementando Lógica da jogada especial Roque Grande
+		//se a peça p que foi movida, for uma instancia de Rei e sua posição de destino for igual a posição de origem - 2, 
+		//significa que o Rei andou duas casas para a esquerda, o que configura uma jogada de Roque Grande
+		if(p instanceof King && target.getColumn() == source.getColumn() - 2) {
+			//posição de Origem da Torre = 4 colunas a esquerda do Rei
+			Position sourceTorre = new Position(source.getRow(), source.getColumn() - 4);
+			//posição de Destino da Torre = 1 coluna a esquerda do Rei
+			Position targetTorre = new Position(source.getRow(), source.getColumn() - 1);
+			ChessPiece rook = (ChessPiece) board.removePiece(sourceTorre); //pega a peça Torre e remove da posição de origem
+			board.placePiece(rook, targetTorre); //move a peça Torre para a posição de destino
+			rook.increaseMoveCount(); //incrementa a quantidade de movimentos feito com a Torre
+		}
+		
 		//e retorna a peça que foi capturada
 		return capturedPiece;
 	}
@@ -215,6 +241,30 @@ public class ChessMatch {
 			board.placePiece(capturedPiece, target);
 			capturedPieces.remove(capturedPiece);
 			piecesOnTheBoard.add(capturedPiece);
+		}
+		//Desfaz a jogada especial Roque Pequeno
+		//se a peça p que foi movida, for uma instancia de Rei e sua posição de destino for igual a posição de origem + 2, 
+		//significa que o Rei andou duas casas para a direita, o que configura uma jogada de Roque Pequeno
+		if(p instanceof King && target.getColumn() == source.getColumn() + 2) {
+			//posição de Origem da Torre = 3 colunas a direita do Rei
+			Position sourceTorre = new Position(source.getRow(), source.getColumn() + 3);
+			//posição de Destino da Torre = 1 coluna a direita do Rei
+			Position targetTorre = new Position(source.getRow(), source.getColumn() + 1);
+			ChessPiece rook = (ChessPiece) board.removePiece(targetTorre); //pega a peça Torre e remove da posição de destino
+			board.placePiece(rook, sourceTorre); //retorna a peça Torre para a posição de origem
+			rook.decreaseMoveCount(); //decrementa a quantidade de movimentos feito com a Torre
+		}
+		//Desfaz a jogada especial Roque Grande
+		//se a peça p que foi movida, for uma instancia de Rei e sua posição de destino for igual a posição de origem - 2, 
+		//significa que o Rei andou duas casas para a esquerda, o que configura uma jogada de Roque Grande
+		if(p instanceof King && target.getColumn() == source.getColumn() - 2) {
+			//posição de Origem da Torre = 4 colunas a esquerda do Rei
+			Position sourceTorre = new Position(source.getRow(), source.getColumn() - 4);
+			//posição de Destino da Torre = 1 coluna a esquerda do Rei
+			Position targetTorre = new Position(source.getRow(), source.getColumn() - 1);
+			ChessPiece rook = (ChessPiece) board.removePiece(targetTorre); //pega a peça Torre e remove da posição de destino
+			board.placePiece(rook, sourceTorre); //retorna a peça Torre para a posição de origem
+			rook.decreaseMoveCount(); //decrementa a quantidade de movimentos feito com a Torre
 		}
 	}
 	
