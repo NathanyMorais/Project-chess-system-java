@@ -46,7 +46,7 @@ public class UI { // classe que representa a interface do usuario
 	public static ChessPosition readChessPosition(Scanner sc) {
 		try {
 			String s = sc.nextLine();
-			char column = s.charAt(0); //lê o primeiro caracter digitado, que é referente a coluna do tabuleiro
+			char column = s.toLowerCase().charAt(0); //lê o primeiro caracter digitado, que é referente a coluna do tabuleiro
 			int row = Integer.parseInt(s.substring(1)); //"recorta a string" para ler o segundo valor digitado, referente a linha do tabuleiro
 			return new ChessPosition(column, row); 
 		}

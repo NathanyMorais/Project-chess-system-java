@@ -45,7 +45,13 @@ public class Program {
 				if(capturedPiece != null) {
 					captured.add(capturedPiece); //adiciona a peça na lista de peças capturadas
 				}
-
+				
+				//implementação de teste para a jogada especial Promotion
+				if(chessMatch.getPromoted() != null) { //se houve peça promovida nesta partida, pede ao jogador para escolher a peça que irá substituir
+					System.out.print("Enter piece for promotion (B/N/R/Q): ");
+					String type = sc.nextLine().toUpperCase();
+					chessMatch.replacePromotedPiece(type); //chama o método de substituir a peça promovida pela peça do tipo que o jogador escolheu
+				}
 			}
 			catch(ChessException e) {
 				System.out.println(e.getMessage());

@@ -1,5 +1,6 @@
 package chess;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +24,11 @@ public class ChessMatch {
 	private boolean check; //check significa que o seu Rei está sob a ameaça de pelo menos uma peça de seu oponente (check tem valor igual a false por padrão)
 	private boolean checkMate;
 	private ChessPiece enPassantVulnerable; //propriedade que representa um peão vulnerável a jogada En Passant (por padrão, começa com valor null, por isso não foi iniciada no construtor)
+	
+	/*	JOGADAS ESPECIAIS: 
+	-> JOGADA PROMOÇÃO: quando um peão percorre o tabuleiro inteiro e chega na última casa, 
+	ele será substituído por uma dessas 4 peças a sua escolha: torre, cavalo, bispo ou rainha.*/
+	private ChessPiece promoted;
 	
 	private List<Piece> piecesOnTheBoard = new ArrayList<>(); //lista de peças no tabuleiro
 	private List<Piece> capturedPieces = new ArrayList<>();  //lista de peças capturadas
@@ -53,6 +59,10 @@ public class ChessMatch {
 	
 	public ChessPiece getEnPassantVulnerable() {
 		return enPassantVulnerable;
+	}
+	
+	public ChessPiece getPromoted() {
+		return promoted;
 	}
 	
 	//método que retorna uma matriz de peças da partida de xadrez
@@ -141,6 +151,21 @@ public class ChessMatch {
 		
 		ChessPiece movedPiece = (ChessPiece) board.piece(target); //representa uma peça que foi movida (variável para testar a jogada En Passant)
 		
+		//Lógica para testar a jogada especial PROMOTION (PROMOÇÃO)
+		promoted = null;
+		//se a peça movida foi um peão, verifica se ela chegou no fim do tabuleiro (na última casa)
+		if(movedPiece instanceof Pawn) {
+			//se o peão é branco e chegou até a última linha OU se o peão é preto e chegou até a última linha
+			if(movedPiece.getColor() == Color.WHITE && target.getRow() == 0 || movedPiece.getColor() == Color.BLACK && target.getRow() == 7) {
+				//então a peça promovida é aquele peão que chegou ao final
+				promoted = (ChessPiece) board.piece(target);
+				//esse peão promovido vai ser substituído por uma peça mais poderosa - por padrão, vai começar sendo trocado pela Rainha
+				promoted = replacePromotedPiece("Q");
+			}
+		}
+		
+		
+		
 		//se o oponente ficou em Check, precisa atualizar o valor do atributo check para True
 		check = (testCheck(opponent(currentPlayer))) ? true : false;
 		
@@ -163,6 +188,35 @@ public class ChessMatch {
 		}
 		
 		return (ChessPiece)capturedPiece;	
+	}
+	
+	//método para fazer a troca da peça promovida por uma peça mais poderosa
+	public ChessPiece replacePromotedPiece(String type) {
+		if(promoted == null) { //se não houver peça promovida, lança uma exceção
+			throw new IllegalStateException("There is no piece to be promoted");
+		}//se o argumento 'type' NÃO for preenchido com uma letra igual a 'B, N, R ou Q', lança uma exceção
+		if(!type.equals("B") && !type.equals("N") && !type.equals("R") && !type.equals("Q")) {
+			throw new InvalidParameterException("Invalid type for promotion");
+		}
+		Position pos = promoted.getChessPosition().toPosition(); //pega a posição da peça peão promovida
+		Piece p = board.removePiece(pos); //remove o peão que estava naquela posição e guarda  ele na variável p
+		piecesOnTheBoard.remove(p); //remove a peça p da lista de peças que estão no tabuleiro
+		
+		//instanciar uma nova peça, referente ao tipo de letra informada, e coloca essa peça na posição em que estava o peão, fazendo a substituição
+		ChessPiece newPiece = newPiece(type, promoted.getColor()); //instancia da nova peça com o tipo e a mesma cor da peça promovida
+		board.placePiece(newPiece, pos); //coloca a nova peça na posição da peça promovida
+		piecesOnTheBoard.add(newPiece); //adiciona a nova peça na lista de peças do tabuleiro
+		
+		return newPiece; 
+	}
+	
+	//método auxiliar pra instanciar uma nova peça específica para o 'replacePromotedPiece()'
+	private ChessPiece newPiece(String type, Color color) {
+		//testa o type e instancia a nova peça de acordo com o tipo que o jogador informar
+		if(type.equals("B")) return new Bishop(board, color);
+		if(type.equals("N")) return new Knight(board, color);
+		if(type.equals("Q")) return new Queen(board, color);
+		return new Rook(board, color);
 	}
 	
 	//método para validar se existe uma peça em tal posição de origem
@@ -389,5 +443,7 @@ public class ChessMatch {
 	}
 	return true; //se o Rei continuou em check após testar os movimentos possíveis de todas as peças aliadas que ainda estão no tabuleiro, então é Xequemate
 	}
+
+
 }
 
