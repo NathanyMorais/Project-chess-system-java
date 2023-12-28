@@ -1,6 +1,5 @@
 package chess;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -163,9 +162,7 @@ public class ChessMatch {
 				promoted = replacePromotedPiece("Q");
 			}
 		}
-		
-		
-		
+
 		//se o oponente ficou em Check, precisa atualizar o valor do atributo check para True
 		check = (testCheck(opponent(currentPlayer))) ? true : false;
 		
@@ -189,14 +186,14 @@ public class ChessMatch {
 		
 		return (ChessPiece)capturedPiece;	
 	}
-	
-	//método para fazer a troca da peça promovida por uma peça mais poderosa
+		
+	//método para fazer a troca da peça promovida por uma peça mais poderosa (Jogada especial PROMOTION)
 	public ChessPiece replacePromotedPiece(String type) {
 		if(promoted == null) { //se não houver peça promovida, lança uma exceção
 			throw new IllegalStateException("There is no piece to be promoted");
-		}//se o argumento 'type' NÃO for preenchido com uma letra igual a 'B, N, R ou Q', lança uma exceção
+		}//se o argumento 'type' NÃO for preenchido com uma letra igual a 'B, N, R ou Q', retorna com a peça promovida padrão, que é a Rainha 'Q'
 		if(!type.equals("B") && !type.equals("N") && !type.equals("R") && !type.equals("Q")) {
-			throw new InvalidParameterException("Invalid type for promotion");
+			return promoted;
 		}
 		Position pos = promoted.getChessPosition().toPosition(); //pega a posição da peça peão promovida
 		Piece p = board.removePiece(pos); //remove o peão que estava naquela posição e guarda  ele na variável p

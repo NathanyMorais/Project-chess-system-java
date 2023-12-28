@@ -50,6 +50,10 @@ public class Program {
 				if(chessMatch.getPromoted() != null) { //se houve peça promovida nesta partida, pede ao jogador para escolher a peça que irá substituir
 					System.out.print("Enter piece for promotion (B/N/R/Q): ");
 					String type = sc.nextLine().toUpperCase();
+					while(!type.equals("B") && !type.equals("N") && !type.equals("R") && !type.equals("Q")) {
+						System.out.print("Invalid value! Enter piece for promotion (B/N/R/Q): ");
+						type = sc.nextLine().toUpperCase();
+					}
 					chessMatch.replacePromotedPiece(type); //chama o método de substituir a peça promovida pela peça do tipo que o jogador escolheu
 				}
 			}
